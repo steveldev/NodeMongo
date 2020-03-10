@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NODE + MONGO</title>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      
+        <script src="https://kit.fontawesome.com/a0e9b6ad39.js" crossorigin="anonymous"></script>
+        <link href="https://kit-free.fontawesome.com/releases/latest/css/free-v4-shims.min.css" media="all" rel="stylesheet" id="font-awesome-5-kit-css">
+        <link href="https://kit-free.fontawesome.com/releases/latest/css/free-v4-font-face.min.css" media="all" rel="stylesheet" id="font-awesome-5-kit-css">
+        <link href="https://kit-free.fontawesome.com/releases/latest/css/free.min.css" media="all" rel="stylesheet" id="font-awesome-5-kit-css">
+      
+       <style type="text/css">
+            html {background:#ddd;}
+            body {max-width:950px;margin:0 auto;background:#fff;}
+            h1 {
+                font-size:1.5rem;
+                background:#efefef;
+                padding:15px;
+                text-align:center;
+                border-bottom:1px solid silver;
+            }
+            .row {margin:0;padding:25px 0;}
+
+
+            .fa, .fas, .far {color:silver;font-size:20px;}
+            .fa:hover, .fas:hover, .far:hover {color:#000;}
+            .fa-trash:hover, .fa-trash-alt:hover, .fa-times:hover {color:red;}
+
+            .delete-field .fas, .delete-field .far,.delete-field .fa { font-size:14px;}
+
+            table {border-collapse: collapse;width:100%;}
+            th {text-align:left;}
+            td, th {border:1px solid #efefef;padding:5px;}
+                ul, li {list-style:none;margin:0;padding:0;}
+                li {padding:5px 0px 5px 15px;}
+
+
+        </style>
+    </head>
+    <body>
+        <h1>API NODE + MONGODB + EXPRESS</h1>
+
+            <% if (locals.flash) { %>
+                <div class="alert alert<% locals.flash[0] %>">
+                    <% locals.flash[1] %>
+                </div>
+            <% } %>
+
+            
+            <%if (typeof product != 'undefined') { %>
+
+                <h5>Edition de l'enregistrement </h5>
+                <div class="row">
+                    <div class="col">
+                        <form method="post" action="http://localhost:8080/products/edit/<%= product._id %>">
+                        <% for (key in product) { %>                
+                            <div class="form-group">
+                                <label><%= key %></label>
+                                <input type="text" name="<%= key %>" class="form-control" value="<%= product[key] %>" required/>
+                            </div>
+                        <% } %> 
+                            <div class="form-fields"></div>                         
+
+                            <div class="text-right padding-tb">
+                                <a href="/" title="">Retour</a>
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                                <button type="submit" class="btn btn-success btn-sm">Enregistrer</button> 
+                            </div>                    
+                        </form>   
+                    </div>
+
+                <!-- OBJECT VIEWER (EDIT) -->
+                <div class="col-4" style="border-left:1px solid #efefef;">                   
+                    <strong>Collection : <%= collectionName %></strong>
+                    <br>{                          
+                        <ul style="font-size:.8rem;" id="objectKeys">
+
+                        <% for (key in product) { %>
+                            <li>
+                                <% if (key != '_id') { %>
+                                    <a href="" title="Supprimer cette clé" style="color:red;" class="delete-field"><i class="fas fa-trash"></i></a>
+                                <% } %>
+                                <strong><%= key %> :</strong> <%= product[key] %>
+                            </li>
+                        <% } %> 
+                        </ul>                  
+                    }                        
+                    <hr/><a href="" title="" id="btn-add-field-form">Ajouter nouvelle clé / valeur</a>
+                    <div class="fields"></div>
+                </div>
+
+            <% } else { %>
+                <div class="row">
+                    <div class="col">
+                        <form method="post" action="http://localhost:8080/products/post">
+                            <h4>Ajouter un enregistrement :</h4>
+                            <div class="form-group">
+                                <label>Nom</label>
+                                <input type="text" name="name" value="" class="form-control" required/>
+                            </div>   
+
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input type="text" name="description" value="" class="form-control" required/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Prix</label>
+                                <input type="number" name="price" value="" class="form-control" required/>
+                            </div>
+
+                            <div class="text-right padding-tb">
+                                <button type="submit" class="btn btn-success btn-sm">Enregistrer</button> 
+                            </div>
+                
+                        </form>
+                    </div>
+                    <!-- OBJECT VIEWER (NEW) -->
+                    <div class="col-4" style="border-left:1px solid #efefef;">
+                        <strong>Collection : <%= collectionName %> </strong>
+                        <br>{                          
+                            <ul style="font-size:.8rem;" id="objectKeys">
+                                <li>
+                                    <strong>_id :</strong> 
+                                </li>
+                                <li>
+                                    <a href="" title="Supprimer cette clé" style="color:red;" class="delete-field"><i class="fas fa-trash"></i></a>
+                                    <strong>name :</strong> 
+                                </li>
+                                <li>
+                                    <a href="" title="Supprimer cette clé" style="color:red;" class="delete-field"><i class="fas fa-trash"></i></a>
+                                    <strong>description :</strong> 
+                                </li>
+                                <li>
+                                    <a href="" title="Supprimer cette clé" style="color:red;" class="delete-field"><i class="fas fa-trash"></i></a>
+                                    <strong>price :</strong> 
+                                </li>
+                            </ul>                  
+                        }                        
+                        <hr/><a href="" title="" id="btn-add-field-form">Ajouter nouvelle clé / valeur</a>
+                        <div class="fields"></div>
+                    </div>
+                </div>
+            <% } %>
+                
+   
+
+                
+        <%if (typeof products != 'undefined') { %>
+            
+        <h5 style="background:#efefef;padding:15px 5px;border:1px solid silver;margin:25px 0;">
+            Collection : <%= collectionName %>  
+            <%if (typeof products != 'undefined') { %>
+                (<%= products.length %> résultats) 
+            <% } %>
+        </h5>
+
+        <table class=" table-hover">
+            <thead>
+            <tr>
+                <th> Nom</th>
+                <th> Description</th>
+                <th class="text-center"> Prix</th>
+                <th class="text-center">Actions</th>
+            </tr>       
+            </thead>
+            <% for(var i=0; i < products.length; i++) { %>
+                <tr>
+                    <td>
+                        <a href="/products/<%= products[i]._id %>" title="Editer">
+                            <%= products[i].name %>
+                        </a> 
+                    </td>
+                    <td> <%= products[i].description %></td>
+                    <td class="text-right"> <%= products[i].price %></td>
+                    <td class="text-right">
+                        <a href="/products/copy/<%= products[i]._id %>" title="Copier"><i class="fas fa-copy"></i></a>
+                        <a href="/products/delete/<%= products[i]._id %>" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                </tr> 
+            <% } %>
+        </table>
+        <div class="text-right">
+            <a href="" title="" class="btn btn-outline-secondary btn-sm" >Précédent</a> 
+            <a href="" title="" class="btn btn-outline-secondary btn-sm m-3">Suivant</a> 
+        </div>
+        <% } %>
+
+        <script>
+            /* Affiche masque des éléments du dom au clic sur un bouton */
+            function toggle(btn, element) {
+                btn.addEventListener('click', (e) => {
+                    if(element.style.display != 'none') {
+                        element.style.display = 'none';
+                    }
+                    else{
+                        element.style.display = 'block';
+                    }
+                });
+            }
+
+
+            /* Affichage du formulaire d'ajout de clé / valeur */
+            document.querySelector('a#btn-add-field-form').addEventListener('click', (e) => { 
+                e.preventDefault();                
+                var html = '';
+                html += '<form class="form-add-field">';
+                html += '<input type="text" name="key" placeholder="label" class="form-control" value="">';
+                html += '<input type="text" name="value" placeholder="valeur" class="form-control" value="">';
+                html += '<a href class="btn btn-info btn-sm btn-add-field" >Ajouter</button></div>';
+                html += '</form>';
+
+                var fields = document.querySelector('.fields');
+                fields.innerHTML = fields.innerHTML  + html;
+
+                /* mise a jour des listener sur les formulaires d'ajout de clé/valeur */
+                var BtnAddField = document.querySelectorAll('.btn-add-field');
+                for(var i = 0; i < BtnAddField.length; i++) {
+                    BtnAddField[i].addEventListener('click', (e) => {
+                        e.preventDefault();
+
+                        if(document.forms[1].elements[0].value != '' && document.forms[1].elements[1].value!= '' )
+                        {                            
+                            var fieldKey = document.forms[1].elements[0].value;
+                            var fieldValue = document.forms[1].elements[1].value;
+                                        
+                            var html = '';
+                            html += '<div class="form-group">';
+                            html += '<label>'+fieldKey+'</label>';
+                            html += '<input type="text" name="'+fieldKey+'" value="'+fieldValue+'" class="form-control">';
+                            html += '</div>';
+
+                            document.forms[0].querySelector('.form-fields').innerHTML = document.forms[0].querySelector('.form-fields').innerHTML + html
+                            //fields.innerHTML = fields.previousSubling.innerHTML  + html;
+                            
+                            // ajout de la clé valeur dans le objetc-view
+                            var li = document.createElement('li');
+                            li.innerHTML = '<a href="" title="Supprimer cette clé" style="color:red;" class="delete-field"><i class="fas fa-trash"></i></a> ';
+                            li.innerHTML += '<em><strong>'+fieldKey+'</strong> : ' + fieldValue + '</em>';
+                            li.setAttribute('style','color:royalblue;');
+                            document.getElementById('objectKeys').appendChild(li);
+                        }
+                        else{
+                            alert('Erreur : Les clés / valeurs ne peuvent être vides');
+                        }
+                    });
+                }
+            });
+
+
+            /* Suppression des clés valeurs */            
+            function setBtnDeleteFileds() {
+                const btns = document.querySelectorAll('.delete-field');
+
+                for(var i = 0; i < btns.length; i++) {   
+                    const elementId = i;         
+
+                    btns[i].addEventListener('click', function(e) {
+
+                        e.preventDefault();
+
+                        // récupére la position du li dans l'object view
+                        var ul = Array.from(this.parentNode.parentNode.children);  
+                        var id = ul.indexOf(this.parentNode);
+                        console.log(ul);
+                        console.log(id);
+
+                        // suppression du li dans l'object viewer
+                        this.parentElement.remove();
+
+                  
+
+
+                        // suppression du form-group du formulaire
+                        document.forms[0].children[id].remove();
+
+                        // regenère les listener sur le object viewer
+                        //setBtnDeleteFileds();
+                    });                   
+                }
+            }
+            setBtnDeleteFileds();
+
+
+        </script>
+    </body>
+</html>
